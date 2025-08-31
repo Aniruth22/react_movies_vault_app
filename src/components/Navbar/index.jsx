@@ -1,7 +1,10 @@
 import { styled, alpha } from '@mui/material/styles';
 import {AppBar,Box,Toolbar,Typography,InputBase} from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import SelectorComponent from '../SelectorComponent';
+import {useDispatch} from 'react-redux';
+import FavouriteButton from '../SelectorComponent';
+import {debounce} from 'lodash';
+import {getMovies,getMoviesOnSearch} from '../../api/movies';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -44,6 +47,13 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export default function Navbar() {
+  
+  const dispatch=useDispatch();
+
+  const OnSearchChange= debounce ((e)=>{
+    let value=e.target.value;
+    value?.trim().length>0?dispatch(getMoviesOnSearch(value)):dispatch(getMovies());
+  },500);
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -58,7 +68,7 @@ export default function Navbar() {
           >
             Movie Vault
           </Typography>
-          <Search>
+          <Search onChange={OnSearchChange}>
             <SearchIconWrapper>
               <SearchIcon />
             </SearchIconWrapper>
@@ -69,11 +79,7 @@ export default function Navbar() {
           </Search>
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: 'flex' } }}>
-
-
-            <SelectorComponent />
-            <SelectorComponent />
-
+            <FavouriteButton/>
           </Box>
         </Toolbar>
       </AppBar>
